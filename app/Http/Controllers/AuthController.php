@@ -136,6 +136,12 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if($user->role == 'candidate' && $user->candidate->status == 'inactive') {
+            return response()->json([
+                'message' => 'Votre compte est inactif sill vous plait attendez la validation de votre compte'
+            ], 401);
+        }
+
         $token = $user->createToken('Syaqa');
         return response()->json([
             'user' => $user,
