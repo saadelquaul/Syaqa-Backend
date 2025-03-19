@@ -2,18 +2,22 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+use App\Http\Controllers\AuthController;
+use App\Http\Middleware\AdminMiddleware;
 
 
-Route::post('/login', 'App\Http\Controllers\AuthController@login');
+
+Route::post('/login', [ App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/logout', 'App\Http\Controllers\AuthController@logout');
-// Route::post('/forgot-password', 'App\Http\Controllers\AuthController@forgotPassword');
-// Route::post('/reset-password', 'App\Http\Controllers\AuthController@resetPassword');
-// Route::post('/update-password', 'App\Http\Controllers\AuthController@updatePassword');
-// Route::post('/update-profile', 'App\Http\Controllers\AuthController@updateProfile');
-// Route::post('/update-profile-picture', 'App\Http\Controllers\AuthController@updateProfilePicture');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+
+    //Admin routes
+    Route::middleware([AdminMiddleware::class])->group(function () {
+        Route::post('/register-monitor', [AuthController::class, 'monitorRegister']);
+    });
+});
 

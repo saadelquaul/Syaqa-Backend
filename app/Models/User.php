@@ -19,6 +19,11 @@ class User extends Authenticatable
         return $this->hasOne(Candidate::class);
     }
 
+    public function monitor()
+    {
+        return $this->hasOne(Monitor::class);
+    }
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -53,4 +58,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
 }

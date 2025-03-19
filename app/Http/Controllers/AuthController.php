@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -45,7 +46,7 @@ class AuthController extends Controller
 
             $cinFile = $request->file('CIN');
             $cmFile = $request->file('CM');
-            
+
 
             Document::create([
                     'candidate_id' => $candidate->id,
@@ -69,4 +70,77 @@ class AuthController extends Controller
             ], 500);
         }
 }
+
+    public function monitorRegister(Request $request){
+
+        $fields = $request->validate([
+            'name' => 'string',
+            'email' => 'string|unique:users,email',
+            'password' => 'string|confirmed',
+            'date_of_birth' => 'date',
+            'address' => 'string',
+            'phone' => 'string',
+            'license_number' => 'string',
+            'employment_date' => 'date',
+            'profile_picture' => 'file|mimes:jpg,png,jpeg|max:2048',
+        ]);
+
+        DB::beginTransaction();
+
+        try
+        {
+
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+            'role' => 'monitor',
+        ]);
+
+        $monitor = $user->monitor()->create([
+                'date_of_birth' => $fields['date_of_birth'],
+                'address' => $fields['address'],
+                'phone_number' => $fields['phone'],
+                'license_number' => $fields['license_number'],
+                'employment_date' => $fields['employment_date'],
+                'profile_picture' => $fields['profile_picture']->store('profile_pictures'),
+            ]);
+
+            DB::commit();
+                return response()->json([
+                    'message' => 'Compte moniteur créé avec succès',
+                    'user' => $user,
+                    'monitor' => $monitor,
+                    ], 201);
+        } catch (\Exception $e){
+            DB::rollBack();
+            return response([
+                'message' => 'Erreur lors de la création du compte',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function login(Request $request) {
+        $fields = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+
+        $user = User::where('email', $fields['email'])->first();
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response()->json([
+                'message' => 'Identifiants incorrects'
+            ], 401);
+        }
+
+        $token = $user->createToken('Syaqa');
+        return response()->json([
+            'user' => $user,
+            'token' => $token->plainTextToken
+        ], 201);
+
+    }
 }
