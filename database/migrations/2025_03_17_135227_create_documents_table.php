@@ -16,8 +16,6 @@ return new class extends Migration
             $table->integer('candidate_id', false, true);
             $table->string('CIN');
             $table->enum('cin_type', ['pdf', 'jpg', 'png', 'jpeg']);
-            $table->string('CM');
-            $table->enum('cm_type', ['pdf', 'jpg', 'png', 'jpeg']);
             $table->timestamps();
             $table->foreign('candidate_id')->references('id')->on('users')->onDelete('cascade');
         });

@@ -10,7 +10,5 @@ class Document extends Model
         'candidate_id',
         'CIN',
         'cin_type',
-        'CM',
-        'cm_type',
-    ];
+        ];
 }

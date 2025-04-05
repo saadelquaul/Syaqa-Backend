@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Document;
@@ -10,33 +12,20 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
-
-        $fields = $request->validate([
-            'name' => 'string',
-            'email' => 'string|unique:users,email',
-            'password' => 'string|confirmed',
-            'date_of_birth' => 'date',
-            'address' => 'string',
-            'phone' => 'string',
-            'license_type' => 'string',
-            'enrollment_date' => 'date',
-            'CIN' => 'file|mimes:pdf,jpg,png,jpeg|max:2048',
-            'CM' => 'file|mimes:pdf,jpg,png,jpeg|max:2048',
-        ]);
+    public function register(RegisterRequest $request)
+    {
+        $fields = $request->validated();
 
         DB::beginTransaction();
 
-        try
-        {
+        try {
+            $user = User::create([
+                'name' => $fields['name'],
+                'email' => $fields['email'],
+                'password' => bcrypt($fields['password']),
+            ]);
 
-        $user = User::create([
-            'name' => $fields['name'],
-            'email' => $fields['email'],
-            'password' => bcrypt($fields['password']),
-        ]);
-
-        $candidate = $user->candidate()->create([
+            $candidate = $user->candidate()->create([
                 'date_of_birth' => $fields['date_of_birth'],
                 'address' => $fields['address'],
                 'phone_number' => $fields['phone'],
@@ -45,59 +34,43 @@ class AuthController extends Controller
             ]);
 
             $cinFile = $request->file('CIN');
-            $cmFile = $request->file('CM');
-
 
             Document::create([
-                    'candidate_id' => $candidate->id,
-                    'CIN' => $cinFile->store('documents'),
-                    'cin_type' => $cinFile->extension(),
-                    'CM' => $cmFile->store('documents'),
-                    'cm_type' => $cmFile->extension(),
-                ]);
+                'candidate_id' => $candidate->id,
+                'CIN' => $cinFile->store('documents'),
+                'cin_type' => $cinFile->extension(),
+            ]);
 
             DB::commit();
-                return response()->json([
-                    'message' => 'Compte candidat créé avec succès',
-                    'user' => $user,
-                    'condidate' => $candidate,
-                    ], 201);
-        } catch (\Exception $e){
+            return response()->json([
+                'message' => 'Compte candidat créé avec succès',
+                'user' => $user,
+                'condidate' => $candidate,
+            ], 201);
+        } catch (\Exception $e) {
             DB::rollBack();
             return response([
                 'message' => 'Erreur lors de la création du compte',
                 'error' => $e->getMessage()
             ], 500);
         }
-}
+    }
 
-    public function monitorRegister(Request $request){
-
-        $fields = $request->validate([
-            'name' => 'string',
-            'email' => 'string|unique:users,email',
-            'password' => 'string|confirmed',
-            'date_of_birth' => 'date',
-            'address' => 'string',
-            'phone' => 'string',
-            'license_number' => 'string',
-            'employment_date' => 'date',
-            'profile_picture' => 'file|mimes:jpg,png,jpeg|max:2048',
-        ]);
+    public function monitorRegister(RegisterRequest $request)
+    {
+        $fields = $request->validated();
 
         DB::beginTransaction();
 
-        try
-        {
+        try {
+            $user = User::create([
+                'name' => $fields['name'],
+                'email' => $fields['email'],
+                'password' => bcrypt($fields['password']),
+                'role' => 'monitor',
+            ]);
 
-        $user = User::create([
-            'name' => $fields['name'],
-            'email' => $fields['email'],
-            'password' => bcrypt($fields['password']),
-            'role' => 'monitor',
-        ]);
-
-        $monitor = $user->monitor()->create([
+            $monitor = $user->monitor()->create([
                 'date_of_birth' => $fields['date_of_birth'],
                 'address' => $fields['address'],
                 'phone_number' => $fields['phone'],
@@ -107,12 +80,12 @@ class AuthController extends Controller
             ]);
 
             DB::commit();
-                return response()->json([
-                    'message' => 'Compte moniteur créé avec succès',
-                    'user' => $user,
-                    'monitor' => $monitor,
-                    ], 201);
-        } catch (\Exception $e){
+            return response()->json([
+                'message' => 'Compte moniteur créé avec succès',
+                'user' => $user,
+                'monitor' => $monitor,
+            ], 201);
+        } catch (\Exception $e) {
             DB::rollBack();
             return response([
                 'message' => 'Erreur lors de la création du compte',
@@ -121,12 +94,8 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request) {
-        $fields = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string',
-        ]);
-
+    public function login(LoginRequest $request) {
+        $fields = $request->validated();
 
         $user = User::where('email', $fields['email'])->first();
 
@@ -146,8 +115,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token->plainTextToken
-        ], 201);
-
+        ], 200);
     }
 
     public function logout(Request $request) {
