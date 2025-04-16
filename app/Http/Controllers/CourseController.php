@@ -20,19 +20,19 @@ class CourseController extends Controller
     }
 
 
-    public function show($id)
-    {
-        $course = Course::find($id);
-        if (!$course) {
-            return response()->json([
-                'message' => 'Course not found'
-            ], 404);
-        }
-        return response()->json([
-            'course' => $course,
-            'message' => 'Course retrieved successfully'
-        ]);
-    }
+    // public function show($id)
+    // {
+    //     $course = Course::find($id);
+    //     if (!$course) {
+    //         return response()->json([
+    //             'message' => 'Course not found'
+    //         ], 404);
+    //     }
+    //     return response()->json([
+    //         'course' => $course,
+    //         'message' => 'Course retrieved successfully'
+    //     ]);
+    // }
 
 
     public function store(CourseRequest $request)
@@ -63,14 +63,11 @@ class CourseController extends Controller
 
         $validatedData = $request->validated();
 
-        // Handle file upload
         if ($request->hasFile('image')) {
-            // Delete the old image
             Storage::disk('public')->delete($course->image);
             $validatedData['image'] = $request->file('image')->store('courses', 'public');
         }
 
-        // Update the course
         $course->update($validatedData);
 
         return response()->json([
@@ -87,10 +84,8 @@ class CourseController extends Controller
             ], 404);
         }
 
-        // Delete the image
         Storage::disk('public')->delete($course->image);
 
-        // Delete the course
         $course->delete();
 
         return response()->json([

@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->string('duration');
-            $table->int('category_id')->unsigned();
+            $table->integer('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->int('monitor_id')->unsigned();
+            $table->integer('monitor_id')->unsigned();
             $table->foreign('monitor_id')->references('id')->on('users');
-            $table->string('image')->nullable();
-            $table->string('video')->nullable();
+            $table->string('image_url')->nullable();
+            $table->string('video_url')->nullable();
             $table->string('status')->default('inactive');
             $table->string('slug')->unique();
             $table->timestamps();

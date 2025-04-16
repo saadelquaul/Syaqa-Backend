@@ -7,14 +7,12 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\MonitorMiddleware;
 use App\Http\Middleware\CandidateMiddleware;
 use App\Http\Controllers\CourseController;
-use App\Models\Monitor;
+use App\Http\Controllers\CategoryController;
 
-Route::post('/login', [ App\Http\Controllers\AuthController::class, 'login']);
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'])->name('register');
-
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-
 
 
     //Admin routes
@@ -23,9 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware([MonitorMiddleware::class])->group(function () {
-        Route::get('/upload-course', [CourseController::class, 'store'])->name('addCourse');
-        // Route::get('/update-course/{id}', [CourseController::class, 'update'])->name('updateCourse');
-        // Route::get('/delete-course/{id}', [CourseController::class, 'destroy'])->name('deleteCourse');
     });
 });
+Route::post('/category', [CategoryController::class, 'store'])->name('addCategory');
 

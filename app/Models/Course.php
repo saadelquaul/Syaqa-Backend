@@ -18,4 +18,16 @@ class Course extends Model
         'slug',
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function monitor()
+    {
+        return $this->belongsTo(User::class, 'monitor_id');
+    }
+
+    
+
 }
