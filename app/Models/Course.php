@@ -11,13 +11,11 @@ class Course extends Model
         'description',
         'duration',
         'category_id',
-        'category_id',
-        'instructor_id',
-        'instructor_id',
+        'monitor_id',
         'image',
-        'content',
+        'video_url',
         'status',
         'slug',
     ];
-    
+
 }

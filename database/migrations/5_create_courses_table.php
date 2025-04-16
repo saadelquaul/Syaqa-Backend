@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('duration');
             $table->int('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->int('instructor_id')->unsigned();
-            $table->foreign('instructor_id')->references('id')->on('users');
+            $table->int('monitor_id')->unsigned();
+            $table->foreign('monitor_id')->references('id')->on('users');
             $table->string('image')->nullable();
-            $table->string('content')->nullable();
+            $table->string('video')->nullable();
             $table->string('status')->default('inactive');
             $table->string('slug')->unique();
             $table->timestamps();

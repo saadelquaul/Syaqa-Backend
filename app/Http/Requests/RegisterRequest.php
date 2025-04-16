@@ -53,4 +53,22 @@ class RegisterRequest extends FormRequest
 
         return [];
     }
+
+    public function messages() {
+        return [
+            'name.required' => 'Le nom est requis.',
+            'email.required' => 'L\'email est requis.',
+            'email.unique' => 'Cet email est déjà utilisé.',
+            'password.required' => 'Le mot de passe est requis.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+            'date_of_birth.required' => 'La date de naissance est requise.',
+            'address.required' => 'L\'adresse est requise.',
+            'phone.required' => 'Le numéro de téléphone est requis.',
+            'license_type.required' => 'Le type de permis est requis.',
+            'enrollment_date.required' => 'La date d\'inscription est requise.',
+            'CIN.required' => 'Le fichier CIN est requis.',
+            'CIN.mimes' => 'Le fichier CIN doit être un fichier de type : jpg, png, jpeg.',
+            'CIN.max' => 'La taille du fichier CIN ne doit pas dépasser 2 Mo.',
+        ];
+    }
 }

@@ -11,4 +11,9 @@ class Document extends Model
         'CIN',
         'cin_type',
         ];
+
+        public function candidate()
+    {
+        return $this->belongsTo(Candidate::class);
+    }
 }

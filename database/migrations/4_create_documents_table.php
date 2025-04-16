@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->integer('candidate_id', false, true);
+            $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
             $table->string('CIN');
-            $table->enum('cin_type', ['pdf', 'jpg', 'png', 'jpeg']);
+            $table->enum('cin_type', ['jpg', 'png', 'jpeg']);
             $table->timestamps();
-            $table->foreign('candidate_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
