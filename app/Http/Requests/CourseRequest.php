@@ -22,14 +22,27 @@ class CourseRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|integer|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:10000' ,
-            'video' => 'required|file|mimes:mp4|max:102400',
+        $rules =  [
+            'description' => 'string',
+            'category_id' => 'exists:categories,id',
         ];
 
+        if ($this->isMethod('post')) {
+            $rules['title'] = 'required|string|max:255';
+            $rules['description'] = 'required|string';
+            $rules['category_id'] = 'required|integer|exists:categories,id';
+            $rules['image'] = 'required|image|mimes:jpeg,png,jpg|max:10000';
+            $rules['video'] = 'required|file|mimes:mp4|max:102400';
+        } else if( $this->isMethod('put')) {
+            $rules['title'] = 'sometimes|string|max:255';
+            $rules['description'] = 'sometimes|string';
+            $rules['category_id'] = 'sometimes|integer|exists:categories,id';
+            $rules['duration'] = 'sometimes|string|max:50';
+            $rules['image'] = 'sometimes|image|mimes:jpeg,png,jpg|max:10000';
+            $rules['video'] = 'sometimes|file|mimes:mp4|max:102400';
+        }
+
+        return $rules;
     }
 
 

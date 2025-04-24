@@ -12,7 +12,7 @@ class Course extends Model
         'duration',
         'category_id',
         'monitor_id',
-        'image',
+        'image_url',
         'video_url',
         'status',
         'slug',
@@ -28,6 +28,18 @@ class Course extends Model
         return $this->belongsTo(User::class, 'monitor_id');
     }
 
-    
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'enrollments', 'course_id', 'user_id')
+                    ->withPivot('status', 'enrolled_at', 'completed_at')
+                    ->withTimestamps();
+    }
+
+
 
 }
