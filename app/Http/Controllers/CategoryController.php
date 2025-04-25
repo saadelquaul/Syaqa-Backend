@@ -153,20 +153,4 @@ class CategoryController extends Controller
             ], 500);
         }
     }
-    public function getCoursesByCategory($id)
-    {
-        $category = Category::with('courses')->find($id);
-
-        if (!$category) {
-            return response()->json([
-                'success' => 'false',
-                'message' => 'Category not found'
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => 'true',
-            'data' => $category->courses
-        ]);
-    }
 }

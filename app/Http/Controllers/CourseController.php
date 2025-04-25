@@ -13,41 +13,41 @@ use Illuminate\Http\Request;
 class CourseController extends Controller
 {
     public function index()
-{
-    $courses = Course::with('category')
-        ->withCount('enrollments')
-        ->get()
-        ->map(function ($course) {
-            return [
-                'id' => $course->id,
-                'title' => $course->title,
-                'description' => $course->description,
-                'slug' => $course->slug,
-                'duration' => $course->duration,
-                'image_url' => $course->image_url,
-                'video_url' => $course->video_url,
-                'status' => $course->status,
-                'created_at' => $course->created_at,
-                'updated_at' => $course->updated_at,
-                'monitor_id' => $course->monitor_id,
-                'monitor_name' => $course->monitor ? $course->monitor->name : null,
-                'category_id' => $course->category_id,
-                'category_name' => $course->category ? $course->category->name : null,
-                'students_count' => $course->enrollments_count ?? 0,
-            ];
-        });
+    {
+        $courses = Course::with('category')
+            ->withCount('enrollments')
+            ->get()
+            ->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'title' => $course->title,
+                    'description' => $course->description,
+                    'slug' => $course->slug,
+                    'duration' => $course->duration,
+                    'image_url' => $course->image_url,
+                    'video_url' => $course->video_url,
+                    'status' => $course->status,
+                    'created_at' => $course->created_at,
+                    'updated_at' => $course->updated_at,
+                    'monitor_id' => $course->monitor_id,
+                    'monitor_name' => $course->monitor ? $course->monitor->name : null,
+                    'category_id' => $course->category_id,
+                    'category_name' => $course->category ? $course->category->name : null,
+                    'students_count' => $course->enrollments_count ?? 0,
+                ];
+            });
 
-    if($courses->isEmpty()) {
+        if ($courses->isEmpty()) {
+            return response()->json([
+                'message' => 'No courses found',
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'No courses found',
-        ], 404);
+            'courses' => $courses,
+            'message' => 'Courses retrieved successfully'
+        ]);
     }
-
-    return response()->json([
-        'courses' => $courses,
-        'message' => 'Courses retrieved successfully'
-    ]);
-}
 
 
     public function show($id)
@@ -139,12 +139,12 @@ class CourseController extends Controller
             $course->video_url = $request->file('video')->store('courses/videos', 'public');
         }
 
-            $course->save();
+        $course->save();
 
-            return response()->json([
-                'message' => 'Course updated successfully',
-                'course' => $course
-            ]);
+        return response()->json([
+            'message' => 'Course updated successfully',
+            'course' => $course
+        ]);
     }
     public function destroy($id)
     {
@@ -186,29 +186,28 @@ class CourseController extends Controller
     {
         $monitorId = Auth::user()->id;
 
-        $courses = Course::where('monitor_id', $monitorId)->
-        with('category')
-        ->withCount('enrollments')
-        ->get()
-        ->map(function ($course) {
-            return [
-                'id' => $course->id,
-                'title' => $course->title,
-                'description' => $course->description,
-                'slug' => $course->slug,
-                'duration' => $course->duration,
-                'image_url' => $course->image_url,
-                'video_url' => $course->video_url,
-                'status' => $course->status,
-                'created_at' => $course->created_at,
-                'updated_at' => $course->updated_at,
-                'monitor_id' => $course->monitor_id,
-                'monitor_name' => $course->monitor ? $course->monitor->name : null,
-                'category_id' => $course->category_id,
-                'category_name' => $course->category ? $course->category->name : null,
-                'students_count' => $course->enrollments_count ?? 0,
-            ];
-        });
+        $courses = Course::where('monitor_id', $monitorId)->with('category')
+            ->withCount('enrollments')
+            ->get()
+            ->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'title' => $course->title,
+                    'description' => $course->description,
+                    'slug' => $course->slug,
+                    'duration' => $course->duration,
+                    'image_url' => $course->image_url,
+                    'video_url' => $course->video_url,
+                    'status' => $course->status,
+                    'created_at' => $course->created_at,
+                    'updated_at' => $course->updated_at,
+                    'monitor_id' => $course->monitor_id,
+                    'monitor_name' => $course->monitor ? $course->monitor->name : null,
+                    'category_id' => $course->category_id,
+                    'category_name' => $course->category ? $course->category->name : null,
+                    'students_count' => $course->enrollments_count ?? 0,
+                ];
+            });
 
         return response()->json([
             'courses' => $courses,
@@ -261,17 +260,16 @@ class CourseController extends Controller
     {
         $user = $request->user();
 
-    if ($user->role === 'admin') {
-        $courses = Course::with('category')->get();
-    } else {
-        $courses = Course::where('monitor_id', $user->id)
-                        ->with('category')
-                        ->get();
-    }
+        if ($user->role === 'admin') {
+            $courses = Course::with('category')->get();
+        } else {
+            $courses = Course::where('monitor_id', $user->id)
+                ->with('category')
+                ->get();
+        }
 
-    return response()->json([
-        'courses' => $courses
-    ]);
+        return response()->json([
+            'courses' => $courses
+        ]);
     }
-
 }

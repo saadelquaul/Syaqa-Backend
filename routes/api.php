@@ -9,6 +9,10 @@ use App\Http\Middleware\CandidateMiddleware;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminCourseController;
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
@@ -20,6 +24,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Admin routes
     Route::middleware([AdminMiddleware::class])->group(function () {
+
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+        Route::get('/admin/recent-registrations', [AdminDashboardController::class, 'recentRegistrations']);
+        Route::get('/admin/recent-courses', [AdminDashboardController::class, 'recentCourses']);
+
+        Route::get('/admin/users', [AdminUserController::class, 'index']);
+        Route::get('/admin/pending-users', [AdminUserController::class, 'pendingCandidates']);
+        Route::get('/admin/users/{id}', [AdminUserController::class, 'show']);
+        Route::post('/admin/condidate/{id}/approve', [AdminUserController::class, 'approveCondidate']);
+        Route::post('/admin/condidate/{id}/reject', [AdminUserController::class, 'rejectCondidate']);
+        Route::put('/admin/users/{id}', [AdminUserController::class, 'update']);
+        Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy']);
+
+        Route::get('/admin/courses', [AdminCourseController::class, 'index']);
+        Route::get('/admin/courses/{id}', [AdminCourseController::class, 'show']);
+        Route::patch('/admin/courses/{id}/status', [AdminCourseController::class, 'updateStatus']);
+        Route::delete('/admin/courses/{id}', [AdminCourseController::class, 'destroy']);
+
         Route::post('/register-monitor', [AuthController::class, 'monitorRegister'])->name('register-monitor');
         Route::get('/courses', [CourseController::class, 'index'])->name('getCourses');
         Route::get('/monitor/getCourses', [CourseController::class, 'getCourses'])->name('getCoursesCount');
