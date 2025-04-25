@@ -9,19 +9,59 @@ use App\Http\Middleware\CandidateMiddleware;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminCourseController;
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
 
 
     //Admin routes
     Route::middleware([AdminMiddleware::class])->group(function () {
+
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+        Route::get('/admin/recent-registrations', [AdminDashboardController::class, 'recentRegistrations']);
+        Route::get('/admin/recent-courses', [AdminDashboardController::class, 'recentCourses']);
+
+        Route::get('/admin/users', [AdminUserController::class, 'index']);
+        Route::get('/admin/pending-users', [AdminUserController::class, 'pendingCandidates']);
+        Route::get('/admin/users/{id}', [AdminUserController::class, 'show']);
+        Route::post('/admin/condidate/{id}/approve', [AdminUserController::class, 'approveCondidate']);
+        Route::post('/admin/condidate/{id}/reject', [AdminUserController::class, 'rejectCondidate']);
+        Route::put('/admin/users/{id}', [AdminUserController::class, 'update']);
+        Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy']);
+
+        Route::get('/admin/courses', [AdminCourseController::class, 'index']);
+        Route::get('/admin/courses/{id}', [AdminCourseController::class, 'show']);
+        Route::patch('/admin/courses/{id}/status', [AdminCourseController::class, 'updateStatus']);
+        Route::delete('/admin/courses/{id}', [AdminCourseController::class, 'destroy']);
+
         Route::post('/register-monitor', [AuthController::class, 'monitorRegister'])->name('register-monitor');
+        Route::get('/courses', [CourseController::class, 'index'])->name('getCourses');
+        Route::get('/monitor/getCourses', [CourseController::class, 'getCourses'])->name('getCoursesCount');
+
     });
 
     Route::middleware([MonitorMiddleware::class])->group(function () {
+
+Route::get('/categories', [CategoryController::class, 'index'])->name('getCategory');
+Route::post('/categories', [CategoryController::class, 'store'])->name('addCategory');
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('deleteCategory');
+Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('getCategoryById');
+Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('updateCategory');
+
+Route::get('/monitor/courses', [CourseController::class, 'filterByMonitor'])->name('getCourses');
+Route::get('/monitor/getCourses', [CourseController::class, 'getCourses'])->name('getCoursesCount');
+Route::post('/courses', [CourseController::class, 'store'])->name('addCourse');
+Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('deleteCourse');
+Route::get('/courses/{course}', [CourseController::class, 'show'])->name('getCourseById');
+Route::put('/courses/{course}', [CourseController::class, 'update'])->name('updateCourse');
     });
 });
-Route::post('/category', [CategoryController::class, 'store'])->name('addCategory');
 

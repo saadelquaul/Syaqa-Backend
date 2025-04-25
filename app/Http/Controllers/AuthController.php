@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -94,18 +95,19 @@ class AuthController extends Controller
         }
     }
 
-    public function login(LoginRequest $request) {
+    public function login(LoginRequest $request)
+    {
         $fields = $request->validated();
 
         $user = User::where('email', $fields['email'])->first();
 
-        if(!$user || !Hash::check($fields['password'], $user->password)){
+        if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response()->json([
                 'message' => 'Identifiants incorrects'
             ], 401);
         }
 
-        if($user->role == 'candidate' && $user->candidate->status == 'inactive') {
+        if ($user->role == 'candidate' && $user->candidate->status == 'inactive') {
             return response()->json([
                 'message' => 'Votre compte est inactif sill vous plait attendez la validation de votre compte'
             ], 401);
@@ -118,11 +120,37 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
 
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'message' => 'Déconnecté'
+        ], 200);
+    }
+
+    public function user(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Utilisateur non authentifié'
+            ], 200);
+        }
+
+        if ($user->role === 'candidate') {
+            $user->load('candidate');
+        } elseif ($user->role === 'monitor') {
+            $user->load('monitor');
+        }
+
+        return response()->json([
+            'user' => $user,
+            'role' => $user->role,
+            'isAdmin' => $user->role === 'admin',
+            'isMonitor' => $user->role === 'monitor',
+            'isCandidate' => $user->role === 'candidate',
         ]);
     }
 }
