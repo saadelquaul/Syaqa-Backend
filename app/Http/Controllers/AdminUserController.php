@@ -26,7 +26,7 @@ class AdminUserController extends Controller
      */
     public function pendingCandidates()
     {
-        $users = Candidate::where('status', 'inactive')->with('user:id,name,email,role')
+        $users = Candidate::where('status', 'inactive')->with('user:id,name,email,role')->with('document')
             ->orderBy('created_at', 'desc')
             ->get(['id', 'user_id', 'status', 'profile_picture', 'created_at']);
 
@@ -43,7 +43,7 @@ class AdminUserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->role === 'candidate') {
-            $user->load('candidate');
+            $user->load('candidate')->load('candidate.document');
         } elseif ($user->role === 'monitor') {
             $user->load('monitor');
         }

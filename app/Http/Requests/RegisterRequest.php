@@ -33,6 +33,7 @@ class RegisterRequest extends FormRequest
                 'license_type' => 'required|string',
                 'enrollment_date' => 'required|date',
                 'CIN' => 'required|file|mimes:pdf,jpg,png,jpeg|max:2048',
+                'profile_picture' => 'string',
             ];
         }
 

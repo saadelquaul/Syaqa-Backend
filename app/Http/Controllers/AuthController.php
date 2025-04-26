@@ -32,13 +32,14 @@ class AuthController extends Controller
                 'phone_number' => $fields['phone'],
                 'license_type' => $fields['license_type'],
                 'enrollment_date' => $fields['enrollment_date'],
+                'profile_picture' => $fields['profile_picture'] ? $fields['profile_picture'] : null,
             ]);
 
             $cinFile = $request->file('CIN');
 
             Document::create([
                 'candidate_id' => $candidate->id,
-                'CIN' => $cinFile->store('documents'),
+                'CIN' => $cinFile->store('documents','public'),
                 'cin_type' => $cinFile->extension(),
             ]);
 
@@ -77,7 +78,7 @@ class AuthController extends Controller
                 'phone_number' => $fields['phone'],
                 'license_number' => $fields['license_number'],
                 'employment_date' => $fields['employment_date'],
-                'profile_picture' => $fields['profile_picture']->store('profile_pictures'),
+                'profile_picture' => $fields['profile_picture']->store('profile_pictures', 'public'),
             ]);
 
             DB::commit();
