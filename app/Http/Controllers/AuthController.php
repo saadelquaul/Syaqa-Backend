@@ -24,15 +24,16 @@ class AuthController extends Controller
                 'name' => $fields['name'],
                 'email' => $fields['email'],
                 'password' => bcrypt($fields['password']),
-            ]);
-
-            $candidate = $user->candidate()->create([
+                'profile_picture' => $fields['profile_picture'] ? $fields['profile_picture'] : null,
                 'date_of_birth' => $fields['date_of_birth'],
                 'address' => $fields['address'],
                 'phone_number' => $fields['phone'],
+            ]);
+
+            $candidate = $user->candidate()->create([
                 'license_type' => $fields['license_type'],
                 'enrollment_date' => $fields['enrollment_date'],
-                'profile_picture' => $fields['profile_picture'] ? $fields['profile_picture'] : null,
+
             ]);
 
             $cinFile = $request->file('CIN');

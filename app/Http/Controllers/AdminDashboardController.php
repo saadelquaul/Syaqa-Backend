@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
-    /**
-     * Get dashboard statistics
-     */
+
     public function index()
     {
 
@@ -29,9 +27,7 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    /**
-     * Get recent registrations for dashboard
-     */
+
     public function recentRegistrations()
     {
         $registrations = Candidate::where('status', 'inactive')->with('user:id,name,email')
@@ -44,9 +40,7 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    /**
-     * Get recent courses for dashboard
-     */
+    
     public function recentCourses()
     {
         $courses = Course::with('category:id,name', 'monitor:id,name')

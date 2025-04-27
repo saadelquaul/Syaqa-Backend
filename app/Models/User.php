@@ -23,7 +23,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(Monitor::class);
     }
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -34,6 +34,11 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'profile_picture',
+        'address',
+        'phone_number',
+        'date_of_birth',
     ];
 
     /**

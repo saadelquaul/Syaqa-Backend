@@ -11,13 +11,9 @@ class Monitor extends Model
 
     protected $fillable = [
         'user_id',
-        'date_of_birth',
-        'address',
-        'phone_number',
         'license_number',
         'employment_date',
-        'status',
-        'profile_picture',
+
     ];
 
     public function user()

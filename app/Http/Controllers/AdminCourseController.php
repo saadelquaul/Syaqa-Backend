@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminCourseController extends Controller
 {
-    /**
-     * Get all courses
-     */
+    
     public function index(Request $request)
     {
         $query = Course::with(['category:id,name', 'monitor:id,name']);
@@ -59,7 +57,7 @@ class AdminCourseController extends Controller
     {
         $course = Course::with(['category', 'monitor'])->findOrFail($id);
 
-        // Get count of enrolled students
+
         $studentsCount = $course->students()->count();
         $course->students_count = $studentsCount;
 
@@ -68,9 +66,7 @@ class AdminCourseController extends Controller
         ]);
     }
 
-    /**
-     * Update course status
-     */
+
     public function updateStatus(Request $request, $id)
     {
         $course = Course::findOrFail($id);
@@ -88,14 +84,12 @@ class AdminCourseController extends Controller
         ]);
     }
 
-    /**
-     * Delete course
-     */
+
     public function destroy($id)
     {
         $course = Course::findOrFail($id);
 
-        // Delete course files if they exist
+
         if ($course->image_url) {
             Storage::disk('public')->delete($course->image_url);
         }
@@ -104,7 +98,7 @@ class AdminCourseController extends Controller
             Storage::disk('public')->delete($course->video_url);
         }
 
-        // Delete enrollments
+
         $course->students()->detach();
 
         $course->delete();

@@ -11,33 +11,37 @@ use Illuminate\Support\Facades\Storage;
 class AdminUserController extends Controller
 {
 
+
     public function index()
     {
         $users = User::orderBy('created_at', 'desc')
-            ->get(['id', 'name', 'email', 'role', 'status', 'profile_picture', 'created_at']);
+            ->get();
+        foreach ($users as $user) {
+            if ($user->role === 'candidate') {
+                $user->load('candidate:id,user_id');
+            } elseif ($user->role === 'monitor') {
+                $user->load('monitor:id,user_id');
+            }
+        }
 
         return response()->json([
             'users' => $users
         ]);
     }
 
-    /**
-     * Get pending users
-     */
+
     public function pendingCandidates()
     {
-        $users = Candidate::where('status', 'inactive')->with('user:id,name,email,role')->with('document')
+        $users = User::where('status', 'inactive')->where('role', 'candidate')->with('candidate')
             ->orderBy('created_at', 'desc')
-            ->get(['id', 'user_id', 'status', 'profile_picture', 'created_at']);
+            ->get();
 
         return response()->json([
             'users' => $users
         ]);
     }
 
-    /**
-     * Show user details
-     */
+
     public function show($id)
     {
         $user = User::findOrFail($id);
@@ -53,12 +57,11 @@ class AdminUserController extends Controller
         ]);
     }
 
-    /**
-     * Approve a user
-     */
+
     public function approveCondidate($id)
     {
-        $user = Candidate::findOrFail($id);
+        $user = User::findOrFail($id);
+
 
         $user->status = 'active';
         $user->save();
@@ -69,9 +72,7 @@ class AdminUserController extends Controller
         ]);
     }
 
-    /**
-     * Reject a user
-     */
+
     public function rejectCondidate($id)
     {
         $user = Candidate::findOrFail($id);
@@ -84,9 +85,7 @@ class AdminUserController extends Controller
         ]);
     }
 
-    /**
-     * Update user
-     */
+
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -94,8 +93,9 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|max:255|unique:users,email,' . $id,
-            'role' => 'sometimes|in:admin,monitor,candidate',
-            'status' => 'sometimes|in:active,pending,suspended',
+            'address' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:255',
+            'status' => 'sometimes|in:active,inactive,rejected,graduated',
         ]);
 
         $user->update($validated);
@@ -106,9 +106,7 @@ class AdminUserController extends Controller
         ]);
     }
 
-    /**
-     * Delete user
-     */
+
     public function destroy($id)
     {
         $user = User::findOrFail($id);

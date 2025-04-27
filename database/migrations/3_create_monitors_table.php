@@ -14,13 +14,8 @@ return new class extends Migration
         Schema::create('monitors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->date('date_of_birth');
-            $table->string('address');
-            $table->string('phone_number');
             $table->string('license_number');
             $table->date('employment_date');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->string('profile_picture')->nullable();
             $table->timestamps();
         });
     }

@@ -14,13 +14,8 @@ return new class extends Migration
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->date('date_of_birth');
-            $table->string('address')->nullable();
-            $table->string('phone_number');
             $table->string('license_type');
             $table->date('enrollment_date')->nullable();
-            $table->enum('status', ['active', 'inactive', 'graduated'])->default('inactive');
-            $table->string('profile_picture')->nullable();
             $table->timestamps();
         });
     }
