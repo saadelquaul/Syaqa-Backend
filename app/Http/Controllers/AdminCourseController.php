@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminCourseController extends Controller
 {
-    
+
     public function index(Request $request)
     {
-        $query = Course::with(['category:id,name', 'monitor:id,name']);
+        $query = Course::with(['category:id,name', 'monitor:id,user_id', 'monitor.user:id,name'])->withCount('enrollments');
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -33,22 +33,7 @@ class AdminCourseController extends Controller
         $courses = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
-            'courses' => $courses->map(function ($course) {
-                return [
-                    'id' => $course->id,
-                    'title' => $course->title,
-                    'description' => $course->description,
-                    'status' => $course->status,
-                    'category_id' => $course->category_id,
-                    'category_name' => $course->category->name,
-                    'created_by' => $course->created_by,
-                    'author_name' => $course->author->name,
-                    'image_url' => $course->image_url,
-                    'video_url' => $course->video_url,
-                    'created_at' => $course->created_at,
-                    'updated_at' => $course->updated_at,
-                ];
-            })
+            'courses' => $courses
         ]);
     }
 
@@ -72,7 +57,7 @@ class AdminCourseController extends Controller
         $course = Course::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:inactive,active',
         ]);
 
         $course->status = $validated['status'];

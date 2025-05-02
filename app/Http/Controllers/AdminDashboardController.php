@@ -16,7 +16,7 @@ class AdminDashboardController extends Controller
 
         $usersCount = User::count();
         $coursesCount = Course::count();
-        $pendingUsersCount = Candidate::where('status', 'inactive')->count();
+        $pendingUsersCount = User::where('status', 'inactive')->where('role','candidate')->count();
         $bookingsCount = Booking::where('status','confirmed')->count();
 
         return response()->json([
@@ -30,7 +30,7 @@ class AdminDashboardController extends Controller
 
     public function recentRegistrations()
     {
-        $registrations = Candidate::where('status', 'inactive')->with('user:id,name,email')
+        $registrations = User::where('status', 'inactive')->where('role','candidate')->with('candidate:id,user_id,license_type,enrollment_date')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -40,10 +40,10 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    
+
     public function recentCourses()
     {
-        $courses = Course::with('category:id,name', 'monitor:id,name')
+        $courses = Course::with('category:id,name', 'monitor:id,user_id', 'monitor.user:id,name')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get(['id', 'title', 'status', 'category_id', 'monitor_id', 'image_url', 'created_at'])
@@ -53,9 +53,10 @@ class AdminDashboardController extends Controller
                     'title' => $course->title,
                     'status' => $course->status,
                     'category_name' => $course->category->name,
-                    'monitor_name' => $course->monitor->name,
+                    'monitor_name' => $course->monitor->user->name,
                     'image_url' => $course->image_url,
                     'created_at' => $course->created_at,
+
                 ];
             });
 

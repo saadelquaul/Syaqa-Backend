@@ -94,7 +94,7 @@ class AdminUserController extends Controller
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|max:255|unique:users,email,' . $id,
             'address' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:255',
+            'phone_number' => 'sometimes|string|max:20',
             'status' => 'sometimes|in:active,inactive,rejected,graduated',
         ]);
 

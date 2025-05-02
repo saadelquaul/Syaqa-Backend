@@ -45,7 +45,7 @@ class RegisterRequest extends FormRequest
                 'password' => 'required|string|confirmed',
                 'date_of_birth' => 'required|date',
                 'address' => 'required|string',
-                'phone' => 'required|string',
+                'phone_number' => 'required|string',
                 'license_number' => 'required|string',
                 'employment_date' => 'required|date',
                 'profile_picture' => 'required|file|mimes:jpg,png,jpeg|max:2048',

@@ -69,7 +69,7 @@ class CourseController extends Controller
     {
 
         $validatedData = $request->validated();
-        $validatedData['monitor_id'] = $request->user()->id;
+        $validatedData['monitor_id'] =  $request->user()->monitor->id;
 
         if ($request->hasFile('image')) {
             $validatedData['image_url'] = $request->file('image')->store('courses', 'public');

@@ -9,7 +9,8 @@ use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -71,15 +72,16 @@ class AuthController extends Controller
                 'email' => $fields['email'],
                 'password' => bcrypt($fields['password']),
                 'role' => 'monitor',
+                'profile_picture' => $fields['profile_picture']->store('profile_pictures', 'public'),
+                'date_of_birth' => $fields['date_of_birth'],
+                'address' => $fields['address'],
+                'phone_number' => $fields['phone_number'],
+                'status' => 'active',
             ]);
 
             $monitor = $user->monitor()->create([
-                'date_of_birth' => $fields['date_of_birth'],
-                'address' => $fields['address'],
-                'phone_number' => $fields['phone'],
                 'license_number' => $fields['license_number'],
                 'employment_date' => $fields['employment_date'],
-                'profile_picture' => $fields['profile_picture']->store('profile_pictures', 'public'),
             ]);
 
             DB::commit();
@@ -105,7 +107,7 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response()->json([
-                'message' => 'Identifiants incorrects'
+                'message' => 'Email ou mot de passe incorrect'
             ], 401);
         }
 
@@ -133,26 +135,41 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        $user = $request->user();
 
-        if (!$user) {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Utilisateur non authentifié'
+                ], 401);
+            }
+
+            if ($user->role === 'candidate') {
+                $user->load(['candidate', 'candidate.document']);
+            } elseif ($user->role === 'monitor') {
+                $user->load('monitor');
+            }
+
+
+            if ($user->profile_picture) {
+                $user->profile_picture_url = url(Storage::url($user->profile_picture));
+            }
+
             return response()->json([
-                'message' => 'Utilisateur non authentifié'
-            ], 200);
-        }
+                'user' => $user,
+                'role' => $user->role,
+                'isAdmin' => $user->role === 'admin',
+                'isMonitor' => $user->role === 'monitor',
+                'isCandidate' => $user->role === 'candidate',
+            ]);
+        } catch (\Exception $e) {
 
-        if ($user->role === 'candidate') {
-            $user->load('candidate');
-        } elseif ($user->role === 'monitor') {
-            $user->load('monitor');
+            Log::error('Error fetching user data: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la récupération des données utilisateur',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'user' => $user,
-            'role' => $user->role,
-            'isAdmin' => $user->role === 'admin',
-            'isMonitor' => $user->role === 'monitor',
-            'isCandidate' => $user->role === 'candidate',
-        ]);
     }
 }

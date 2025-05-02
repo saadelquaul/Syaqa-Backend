@@ -25,7 +25,7 @@ class Course extends Model
 
     public function monitor()
     {
-        return $this->belongsTo(User::class, 'monitor_id');
+        return $this->belongsTo(Monitor::class,);
     }
 
     public function enrollments()
