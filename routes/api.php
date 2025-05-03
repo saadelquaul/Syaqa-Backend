@@ -13,6 +13,8 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminCourseController;
 
+use App\Http\Controllers\QuizQuestionController;
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
@@ -62,5 +64,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('deleteCourse');
         Route::get('/courses/{course}', [CourseController::class, 'show'])->name('getCourseById');
         Route::put('/courses/{course}', [CourseController::class, 'update'])->name('updateCourse');
+
+    Route::get('/quiz-questions', [QuizQuestionController::class, 'index']);
+    Route::post('/quiz-questions', [QuizQuestionController::class, 'store']);
+    Route::get('/quiz-questions/{id}', [QuizQuestionController::class, 'show']);
+    Route::put('/quiz-questions/{id}', [QuizQuestionController::class, 'update']);
+    Route::delete('/quiz-questions/{id}', [QuizQuestionController::class, 'destroy']);
     });
 });

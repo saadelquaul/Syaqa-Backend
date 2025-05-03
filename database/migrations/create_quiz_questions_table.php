@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('quiz_questions', function (Blueprint $table) {
             $table->id();
+            $table->string('question');
+            $table->string('option_a');
+            $table->string('option_b');
+            $table->string('option_c')->nullable();
+            $table->string('option_d')->nullable();
+            $table->string('correct_answer');
             $table->timestamps();
         });
     }
