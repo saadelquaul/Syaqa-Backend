@@ -14,6 +14,11 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminCourseController;
 
 use App\Http\Controllers\QuizQuestionController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\QuizController;
+use App\Http\Controllers\UserController;
+
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -22,6 +27,30 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/user', [UserController::class, 'show']);
+    Route::put('/user', [UserController::class, 'update']);
+    Route::post('/user/profile-picture', [UserController::class, 'updateProfilePicture']);
+
+    Route::middleware([CandidateMiddleware::class])->prefix('candidate')->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+
+        Route::get('/courses/enrolled', [CourseController::class, 'enrolledCourses']);
+        Route::get('/courses/available', [CourseController::class, 'availableCourses']);
+        Route::get('/courses/{course}', [CourseController::class, 'showCourse']);
+        Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll']);
+        Route::get('/courses/{course}/progress', [CourseController::class, 'progress']);
+        Route::post('/courses/{course}/progress', [CourseController::class, 'updateEnrollment']);
+
+        // Route::post('/courses/{course}/lessons/{lesson}/progress', [LessonController::class, 'updateProgress']);
+        // Route::get('/courses/{course}/lessons/{lesson}', [LessonController::class, 'show']);
+
+        Route::get('/quiz/generate', [QuizController::class, 'generateQuiz']);
+        Route::post('/quiz/submit', [QuizController::class, 'store']);
+        Route::get('/quiz/history', [QuizController::class, 'history']);
+        Route::get('/quiz/statistics', [QuizController::class, 'statistics']);
+        Route::get('/quiz/results/{attempt}', [QuizController::class, 'results']);
+    });
 
 
 
@@ -65,10 +94,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/courses/{course}', [CourseController::class, 'show'])->name('getCourseById');
         Route::put('/courses/{course}', [CourseController::class, 'update'])->name('updateCourse');
 
-    Route::get('/quiz-questions', [QuizQuestionController::class, 'index']);
-    Route::post('/quiz-questions', [QuizQuestionController::class, 'store']);
-    Route::get('/quiz-questions/{id}', [QuizQuestionController::class, 'show']);
-    Route::put('/quiz-questions/{id}', [QuizQuestionController::class, 'update']);
-    Route::delete('/quiz-questions/{id}', [QuizQuestionController::class, 'destroy']);
+        Route::get('/quiz-questions', [QuizQuestionController::class, 'index']);
+        Route::post('/quiz-questions', [QuizQuestionController::class, 'store']);
+        Route::get('/quiz-questions/{id}', [QuizQuestionController::class, 'show']);
+        Route::put('/quiz-questions/{id}', [QuizQuestionController::class, 'update']);
+        Route::delete('/quiz-questions/{id}', [QuizQuestionController::class, 'destroy']);
     });
 });
