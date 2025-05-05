@@ -295,7 +295,7 @@ class CourseController extends Controller
         if ($user->role === 'admin') {
             $courses = Course::with('category')->get();
         } else {
-            $courses = Course::where('monitor_id', $user->id)
+            $courses = Course::where('monitor_id', $user->monitor->id)
                 ->with('category')
                 ->get();
         }

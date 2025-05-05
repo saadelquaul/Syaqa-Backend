@@ -41,10 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll']);
         Route::get('/courses/{course}/progress', [CourseController::class, 'progress']);
         Route::post('/courses/{course}/progress', [CourseController::class, 'updateEnrollment']);
-
-        // Route::post('/courses/{course}/lessons/{lesson}/progress', [LessonController::class, 'updateProgress']);
-        // Route::get('/courses/{course}/lessons/{lesson}', [LessonController::class, 'show']);
-
+        
         Route::get('/quiz/generate', [QuizController::class, 'generateQuiz']);
         Route::post('/quiz/submit', [QuizController::class, 'store']);
         Route::get('/quiz/history', [QuizController::class, 'history']);
