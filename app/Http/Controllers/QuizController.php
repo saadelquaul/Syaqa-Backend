@@ -70,7 +70,7 @@ class QuizController extends Controller
 
     public function generateQuiz(Request $request)
     {
-        // Get authenticated user's candidate
+       
         $user = $request->user();
         $candidate = $user->candidate;
 
@@ -184,8 +184,6 @@ class QuizController extends Controller
             ], 404);
         }
 
-        // For a real implementation, we would need a table to store the specific answers
-        // But for now, we'll just return the summary
         return response()->json([
             'quiz' => [
                 'id' => $quiz->id,
@@ -194,8 +192,6 @@ class QuizController extends Controller
                 'incorrect_answers' => $quiz->incorrect_answers,
                 'total_questions' => $quiz->total_questions,
                 'score' => $quiz->score,
-                // In a complete implementation, we would include:
-                // 'questions' => [...] with user answers and correct answers
             ],
             'message' => 'Quiz results retrieved successfully'
         ]);
