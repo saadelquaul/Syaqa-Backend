@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->string('duration');
-            $table->integer('category_id')->unsigned();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->integer('monitor_id')->unsigned();
-            $table->foreign('monitor_id')->references('id')->on('users');
+            $table->integer('category_id')->unsigned()->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->integer('monitor_id')->unsigned()->nullable();
+            $table->foreign('monitor_id')->references('id')->on('monitors');
             $table->string('image_url')->nullable();
             $table->string('video_url')->nullable();
             $table->string('status')->default('inactive');
