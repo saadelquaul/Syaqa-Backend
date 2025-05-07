@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
 use App\Models\Enrollment;
-use App\Models\Course;
-use App\Models\Booking;
 
 class DashboardController extends Controller
 {
