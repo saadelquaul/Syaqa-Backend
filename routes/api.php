@@ -15,7 +15,6 @@ use App\Http\Controllers\AdminCourseController;
 
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LessonController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
 
@@ -41,7 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll']);
         Route::get('/courses/{course}/progress', [CourseController::class, 'progress']);
         Route::post('/courses/{course}/progress', [CourseController::class, 'updateEnrollment']);
-        
+
         Route::get('/quiz/generate', [QuizController::class, 'generateQuiz']);
         Route::post('/quiz/submit', [QuizController::class, 'store']);
         Route::get('/quiz/history', [QuizController::class, 'history']);
