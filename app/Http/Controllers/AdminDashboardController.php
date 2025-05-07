@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Course;
-use App\Models\Booking;
 use App\Models\Candidate;
 use Illuminate\Http\Request;
 
@@ -17,13 +16,11 @@ class AdminDashboardController extends Controller
         $usersCount = User::count();
         $coursesCount = Course::count();
         $pendingUsersCount = User::where('status', 'inactive')->where('role','candidate')->count();
-        $bookingsCount = Booking::where('status','confirmed')->count();
 
         return response()->json([
             'users_count' => $usersCount,
             'courses_count' => $coursesCount,
-            'pending_users_count' => $pendingUsersCount,
-            'bookings_count' => $bookingsCount,
+            'pending_users_count' => $pendingUsersCount
         ]);
     }
 
