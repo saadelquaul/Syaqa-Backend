@@ -50,11 +50,12 @@ class CourseController extends Controller
         ]);
     }
 
-    public function showCourse(Request $request, $courseId){
+    public function showCourse(Request $request, $courseId)
+    {
 
         $user = $request->user();
 
-        $enrollment = Enrollment::where('user_id', $user->id)
+        $enrollment = Enrollment::where('candidate_id', $user->id)
             ->where('course_id', $courseId)->with('course')
             ->first();
 
@@ -255,6 +256,42 @@ class CourseController extends Controller
             'message' => 'Courses retrieved successfully'
         ]);
     }
+    public function enroll(Request $request, Course $course)
+    {
+
+        $user = $request->user();
+
+        if ($course->status !== 'active') {
+            return response()->json([
+                'message' => 'This course is not available for enrollment'
+            ], 403);
+        }
+
+        $existingEnrollment = $user->belongsToMany(Course::class, 'enrollments', 'candidate_id', 'course_id')
+            ->where('courses.id', $course->id)
+            ->first();
+
+        if ($existingEnrollment) {
+            return response()->json([
+                'message' => 'You are already enrolled in this course'
+            ], 409);
+        }
+
+
+        $enrollment = $user->belongsToMany(Course::class, 'enrollments', 'candidate_id', 'course_id')
+            ->attach($course->id, [
+                'status' => 'active',
+                'enrolled_at' => now()
+            ]);
+
+        return response()->json([
+            'message' => 'Successfully enrolled in course',
+            'course' => [
+                'id' => $course->id,
+                'title' => $course->title
+            ]
+        ], 201);
+    }
     public function filterByDuration($duration)
     {
         $courses = Course::where('duration', $duration)->get();
@@ -305,10 +342,11 @@ class CourseController extends Controller
         ]);
     }
 
-    public function enrolledCourses(Request $request) {
+    public function enrolledCourses(Request $request)
+    {
         $user = $request->user();
 
-        $enrolledCourses = $user->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
+        $enrolledCourses = $user->belongsToMany(Course::class, 'enrollments', 'candidate_id', 'course_id')
             ->withPivot('status', 'enrolled_at', 'completed_at')
             ->with('category', 'monitor.user')
             ->get()
@@ -335,10 +373,11 @@ class CourseController extends Controller
         ]);
     }
 
-    public function availableCourses(Request $request) {
+    public function availableCourses(Request $request)
+    {
         $user = $request->user();
 
-        $enrolledCourseIds = $user->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
+        $enrolledCourseIds = $user->belongsToMany(Course::class, 'enrollments', 'candidate_id', 'course_id')
             ->pluck('courses.id');
 
         $availableCourses = Course::where('status', 'active')
@@ -365,48 +404,12 @@ class CourseController extends Controller
         ]);
     }
 
-    public function enroll(Request $request, Course $course)
-    {
-
-        $user = $request->user();
-
-    if ($course->status !== 'active') {
-        return response()->json([
-            'message' => 'This course is not available for enrollment'
-        ], 403);
-    }
-
-    $existingEnrollment = $user->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
-        ->where('courses.id', $course->id)
-        ->first();
-
-    if ($existingEnrollment) {
-        return response()->json([
-            'message' => 'You are already enrolled in this course'
-        ], 409);
-    }
-
-
-    $enrollment = $user->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
-        ->attach($course->id, [
-            'status' => 'active',
-            'enrolled_at' => now()
-        ]);
-
-    return response()->json([
-        'message' => 'Successfully enrolled in course',
-        'course' => [
-            'id' => $course->id,
-            'title' => $course->title
-        ]
-    ], 201);
-    }
 
     public function updateEnrollment(Request $request, Course $course)
     {
         $user = $request->user();
 
-        $enrollment = $user->belongsToMany(Course::class, 'enrollments', 'user_id', 'course_id')
+        $enrollment = $user->belongsToMany(Course::class, 'enrollments', 'candidate_id', 'course_id')
             ->where('courses.id', $course->id)
             ->first();
 
